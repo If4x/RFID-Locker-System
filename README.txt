@@ -33,8 +33,6 @@ Port 8181.
 Example:
 The IPv4-Address of the system the server is running on is 192.168.178.69
 The Website is hosted on port 8181 so the address of the Website is:
-http://192.168.178.69:8181
-In general:
 http://<Your IP-Address>:8181
 
 5. Special Thanks
