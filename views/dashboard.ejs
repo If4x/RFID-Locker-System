@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFID Locker System Dashboard</title>
+
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="plugins/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="plugins/css/buttons.bootstrap5.min.css">
+
+    <link rel="stylesheet" href="bootstrap-icons/bootstrap-icons.css">
+
+    <style>
+        .dataTables_length,.dt-buttons {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="col-lg-8 mx-auto p-4 py-md-5">
+        <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+          <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+            <span class="fs-4">RFID Locker System</span>
+          </a>
+        </header>
+      
+        <main>
+          <h1>Add User</h1>
+          <p class="fs-5 col-md-8">To ad an user just click the button below and enter the asked information for new User.</p>
+      
+          <div class="mb-5">
+            <a href="#" class="btn btn-primary btn-lg px-4" onclick="createUser()">Create user</a>
+          </div>
+      
+          <hr class="col-3 col-md-2 mb-5">
+      
+          <div class="row g-5">
+            <div class="col-md-12">
+                <table id="users" class="table table-striped" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>First name</th>
+                            <th>Last name</th>
+                            <th>UID</th>
+                            <th>Locker</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach(function(user) { %>
+                            <tr>
+                              <td><%= user.first_name %></td>
+                                <td><%= user.last_name %></td>
+                                <td><%= user.uid %></td>
+                                <td><%= user.locker %></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="updateUser('<%= user.first_name %>', '<%= user.last_name %>', '<%= user.uid %>', <%= user.locker %>)">
+                                            <i class="bi bi-pencil-square"></i>
+                                          <span class="visually-hidden">Edit</span>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="deleteUser('<%= user.first_name %>', '<%= user.last_name %>', '<%= user.uid %>', <%= user.locker %>)">
+                                            <i class="bi bi-trash"></i>
+                                          <span class="visually-hidden">Delete</span>
+                                        </button>
+                                      </div>
+                                </td>
+                            </tr>
+                          <% }); %>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>First name</th>
+                            <th>Last name</th>
+                            <th>UID</th>
+                            <th>Locker</th>
+                            <th>Actions</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+          </div>
+        </main>
+        <footer class="pt-5 my-5 text-muted border-top">
+          RFID Locker System | Webinterface by Imanuel Fehse &copy; 2022
+        </footer>
+      </div>
+
+    <script src="jquery/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script src="plugins/js/jquery.dataTables.min.js"></script>
+    <script src="plugins/js/dataTables.bootstrap5.min.js"></script>
+    <script src="plugins/js/dataTables.buttons.min.js"></script>
+    <script src="plugins/js/buttons.bootstrap5.min.js"></script>
+
+    <script src="plugins/js/jszip.min.js"></script>
+    <script src="plugins/js/pdfmake.min.js"></script>
+    <script src="plugins/js/vfs_fonts.js"></script>
+    <script src="plugins/js/buttons.html5.min.js"></script>
+    <script src="plugins/js/buttons.print.min.js"></script>
+    <script src="plugins/js/buttons.colVis.min.js"></script>
+
+    <script src="plugins/js/bs_dialogs.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#users').DataTable({
+                lengthChange: true,
+                buttons: [
+                    {
+                        extend: 'copy',
+                        title: 'Users List',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3]
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        title: 'Users List',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3]
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        title: 'Users List',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3]
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        title: 'Users List',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3]
+                        }
+                    },
+                    {
+                        extend: 'colvis',
+                        title: 'Users List',
+                    }
+                ]
+            });
+            table.buttons().container()
+                .appendTo('#users_wrapper .col-md-6:eq(0)');
+        });
+    </script>
+
+    <script>
+      // Create user
+      async function createUser() {
+        let frm = `<form>
+          <div class="mb-3">
+            <label for="inputFname" class="form-label">First name</label>
+            <input type="text" data-name="fname" class="form-control" id="inputFname" aria-describedby="fnameHelp" required>
+            <div id="fnameHelp" class="form-text">First name of new user</div>
+          </div>
+          <div class="mb-3">
+            <label for="inputLname" class="form-label">Last name</label>
+            <input type="text" data-name="lname" class="form-control" id="inputLname" aria-describedby="lnameHelp" required>
+            <div id="lnameHelp" class="form-text">Last name of new user</div>
+          </div>
+          <div class="mb-3">
+            <label for="inputUid" class="form-label">UID</label>
+            <input type="text" data-name="uid" class="form-control" id="inputUid" aria-describedby="uidHelp" required>
+            <div id="uidHelp" class="form-text">UID of the RFID cards which belongs to the user</div>
+          </div>
+          <div class="mb-3">
+            <label for="inputLocker" class="form-label">Locker</label>
+            <input type="number" data-name="locker" class="form-control" id="inputLocker" aria-describedby="lockerHelp" required>
+            <div id="lockerHelp" class="form-text">Locker which belongs to the user</div>
+          </div>
+        </form>`
+        let dlg = new BsDialogs()
+        dlg.form('Create a new user', 'Create', frm)
+        while (true) {
+            let ret = await dlg.onsubmit(true)
+            if (ret === undefined) { // close form
+                break
+            }
+            $.ajax({
+              url: '/create_user',
+              type: 'post',
+              data: {fname:ret['fname'],lname: ret['lname'],uid: ret['uid'],locker: ret['locker']},
+              success: async function(response){
+                let suc = await new BsDialogs().custom('Success', 'Succesfully created the user ' + ret['fname'] + ' ' + ret['lname'] + ' with UID ' + ret['uid'] + ' and locker ' + ret['locker'] + '.',  [['Close', 'btn-secondary', 'close'], ['Reload page', 'btn-primary', 'reload']])
+                if(suc === 'reload'){
+                  location.reload();
+                }
+              },
+              error: function(error){
+                new BsDialogs().ok('Error', 'Some error happened while creating the user.')
+              }
+            });
+            break
+        }
+        dlg.close()
+      }
+
+
+      // Delete user
+      async function deleteUser(fname, lname, uid, locker) {
+        let ret = await new BsDialogs().custom(
+          'Delete user', 'Are you sure you want to delete the user ' + fname + ' ' + lname + ' with UID ' + uid + ' and locker ' + locker + '?',
+          [['Abort', 'btn-secondary', 'abort'], ['Yes', 'btn-primary', 'yes']]
+        )
+        if(ret === 'yes'){
+          $.ajax({
+            url: '/delete_user',
+            type: 'post',
+            data: {uid: uid},
+            success: async function(response){
+              let suc = await new BsDialogs().custom('Success', 'Succesfully deleted the user ' + fname + ' ' + lname + ' with UID ' + uid + ' and locker ' + locker + '.',  [['Close', 'btn-secondary', 'close'], ['Reload page', 'btn-primary', 'reload']])
+              if(suc === 'reload'){
+                location.reload();
+              }
+            },
+            error: function(error){
+              new BsDialogs().ok('Error', 'Some error happened while deleting the user.')
+            }
+          });
+        }
+      }
+      
+
+      // Edit user
+      async function updateUser(fname, lname, uid, locker) {
+        let frm = `<form>
+          <div class="mb-3">
+            <label for="inputFname" class="form-label">First name</label>
+            <input type="text" data-name="fname" class="form-control" id="inputFname" aria-describedby="fnameHelp" value="${fname}" required>
+            <div id="fnameHelp" class="form-text">Users first name</div>
+          </div>
+          <div class="mb-3">
+            <label for="inputLname" class="form-label">Last name</label>
+            <input type="text" data-name="lname" class="form-control" id="inputLname" aria-describedby="lnameHelp" value="${lname}" required>
+            <div id="lnameHelp" class="form-text">Users last name</div>
+          </div>
+          <div class="mb-3">
+            <label for="inputUid" class="form-label">UID</label>
+            <input type="text" data-name="uid" class="form-control" id="inputUid" aria-describedby="uidHelp" value="${uid}" required>
+            <div id="uidHelp" class="form-text">UID of the RFID card which belongs to the user</div>
+          </div>
+          <div class="mb-3">
+            <label for="inputLocker" class="form-label">Locker</label>
+            <input type="number" data-name="locker" class="form-control" id="inputLocker" aria-describedby="lockerHelp" value="${locker}" required>
+            <div id="lockerHelp" class="form-text">Locker which belongs to the user</div>
+          </div>
+        </form>`
+        let dlg = new BsDialogs()
+        dlg.form('Edit user', 'Save Changes', frm)
+        while (true) {
+            let ret = await dlg.onsubmit(true)
+            if (ret === undefined) { // close form
+                break
+            }
+            $.ajax({
+              url: '/update_user',
+              type: 'post',
+              data: {fname:ret['fname'],lname: ret['lname'],uid: uid,new_uid: ret['uid'], locker: ret['locker']},
+              success: async function(response){
+                let suc = await new BsDialogs().custom('Success', 'Succesfully edited the user ' + fname + ' ' + lname + ' with UID ' + uid + ' and locker ' + locker + ' to ' + ret['fname'] + ' ' + ret['lname'] + ' with UID ' + ret['uid'] + ' and locker ' + ret['locker'] + '.' ,  [['Close', 'btn-secondary', 'close'], ['Reload page', 'btn-primary', 'reload']])
+                if(suc === 'reload'){
+                  location.reload();
+                }
+              },
+              error: function(error){
+                new BsDialogs().ok('Error', 'Some error happened while editing the user.')
+              }
+            });
+            break
+        }
+        dlg.close()
+      }
+    </script>
+</body>
+</html>

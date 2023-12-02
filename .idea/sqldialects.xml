@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/core/db_managment/change_user.py" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/core/db_managment/check_user_already_existing.py" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/core/db_managment/get_log.py" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/core/db_managment/get_user_names.py" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/server.js" dialect="GenericSQL" />
+  </component>
+</project>
